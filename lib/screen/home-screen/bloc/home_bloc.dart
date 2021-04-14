@@ -20,6 +20,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) async* {
     if (event is GetDataEvent) {
       yield* _mapGetDataEventToState(event, state);
+    } else if (event is LoadMoreDataEvent) {
+      yield* _mapLoadMoreDataEventToState(event, state);
     }
   }
 
@@ -32,6 +34,24 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
     if (res is DataCounterResponse) {
       repo.data = res;
+      repo.records = res.result?.records ?? [];
+      yield RenderDataState();
+    } else {
+      yield GetDataErrorState(error);
+    }
+  }
+
+  Stream<HomeState> _mapLoadMoreDataEventToState(
+      LoadMoreDataEvent event, HomeState state) async* {
+    yield HomeLoadingState();
+    var res, error;
+    res = await repo.loadMoreData().catchError((onError) {
+      error = onError;
+    });
+    if (res is DataCounterResponse) {
+      repo.records.addAll(res.result?.records ?? []);
+      repo.data?.result?.links = res.result?.links;
+      repo.data?.result?.total = res.result?.total;
       yield RenderDataState();
     } else {
       yield GetDataErrorState(error);

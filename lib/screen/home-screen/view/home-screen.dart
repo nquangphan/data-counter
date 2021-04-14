@@ -25,6 +25,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
   late HomeRepository _repo;
+  late ScrollController _controller;
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_scrollListener);
+  }
+
+  _scrollListener() {
+    if (_controller.offset >= _controller.position.maxScrollExtent &&
+        !_controller.position.outOfRange) {
+      // message = "reach the bottom";
+      if (!_repo.isLoadAllData())
+        context.read<HomeBloc>().add(LoadMoreDataEvent());
+    }
+    if (_controller.offset <= _controller.position.minScrollExtent &&
+        !_controller.position.outOfRange) {
+      // message = "reach the top";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _repo = context.watch();
@@ -41,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
             child: BlocBuilder<HomeBloc, HomeState>(
               buildWhen: (previous, current) => current is RenderDataState,
               builder: (context, state) {
-                if (_repo.data?.result?.records?.isNotEmpty != true) {
+                if (_repo.data?.result?.records?.isNotEmpty != true &&
+                    state is GetDataErrorState) {
                   return Container(
                       child: Center(
                           child: TextButton(
@@ -56,13 +78,12 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
                 }
                 return Container(
                   child: ListView.builder(
-                    itemCount: _repo.data?.result?.records?.length ?? 0,
+                    controller: _controller,
+                    itemCount: _repo.records.length ?? 0,
                     itemBuilder: (BuildContext context, int index) {
                       return DataItem(
-                        record: _repo.data?.result?.records![index],
-                        prevRecord: index > 0
-                            ? _repo.data?.result?.records![index - 1]
-                            : null,
+                        record: _repo.records[index],
+                        prevRecord: index > 0 ? _repo.records[index - 1] : null,
                       );
                     },
                   ),
