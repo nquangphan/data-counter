@@ -1,3 +1,4 @@
+import 'package:data_counter/api/api_service.dart';
 import 'package:data_counter/screen/home-screen/bloc/home_bloc.dart';
 import 'package:data_counter/screen/home-screen/repository/home-repository.dart';
 import 'package:data_counter/screen/home-screen/view/home-screen.dart';
@@ -5,7 +6,6 @@ import 'package:data_counter/utils/logger.dart';
 import 'package:data_counter/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info/package_info.dart';
 
 import 'config.dart';
@@ -34,7 +34,7 @@ setupEnv(BuildFlavor buildFlavor, [bool runTest = false]) async {
     default:
       break;
   }
-
+  appApiService.init();
   printLog("---------> appBaseUrl: $appBaseUrl");
 }
 

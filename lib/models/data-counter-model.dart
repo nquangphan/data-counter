@@ -6,7 +6,6 @@ import 'dart:convert';
 
 DataCounterResponse dataCounterResponseFromJson(String str) =>
     DataCounterResponse.fromJson(json.decode(str));
-
 String dataCounterResponseToJson(DataCounterResponse data) =>
     json.encode(data.toJson());
 
@@ -167,17 +166,17 @@ class Links {
 
 class Record {
   Record({
-    this.volumeOfMobileData,
+    required this.volumeOfMobileData,
     this.quarter,
     this.id,
   });
 
-  String? volumeOfMobileData;
+  double volumeOfMobileData;
   String? quarter;
   int? id;
 
   Record copyWith({
-    String? volumeOfMobileData,
+    double? volumeOfMobileData,
     String? quarter,
     int? id,
   }) =>
@@ -189,8 +188,8 @@ class Record {
 
   factory Record.fromJson(Map<String, dynamic> json) => Record(
         volumeOfMobileData: json["volume_of_mobile_data"] == null
-            ? null
-            : json["volume_of_mobile_data"],
+            ? 0
+            : double.tryParse(json["volume_of_mobile_data"])??0,
         quarter: json["quarter"] == null ? null : json["quarter"],
         id: json["_id"] == null ? null : json["_id"],
       );

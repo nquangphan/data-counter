@@ -9,7 +9,8 @@ class AppApiService {
   final dio = Dio();
   late APIClient client;
 
-  void create() {
+  void init() {
+    dio.clear();
     dio.options.receiveTimeout = 3 * 1000;
     dio.options.sendTimeout = 5 * 1000;
     dio.options.headers["content-type"] = "application/json";

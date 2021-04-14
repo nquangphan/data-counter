@@ -14,7 +14,7 @@ enum BuildFlavor {
 
 BuildFlavor buildFlavor = BuildFlavor.development;
 
-AppApiService appApiService = AppApiService();
+AppApiService appApiService = AppApiService()..init();
 
 String appBaseUrl = "https://data.gov.sg/";
 
