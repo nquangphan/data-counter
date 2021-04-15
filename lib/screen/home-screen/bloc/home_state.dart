@@ -15,6 +15,9 @@ class HomeLoadingState extends HomeState {
 }
 
 class RenderDataState extends HomeState {
+  final List<DataByYear> data;
+
+  RenderDataState(this.data);
   @override
   List<Object> get props => [Uuid().v4()];
 }

@@ -22,7 +22,7 @@ class _APIClient implements APIClient {
         DataCounterResponse>(Options(
             method: 'GET', headers: <String, dynamic>{}, extra: _extra)
         .compose(_dio.options,
-            '/api/action/datastore_search?resource_id=a807b7ab-6cad-4aa6-87d0-e283a7353a0f&limit=20',
+            '/api/action/datastore_search?resource_id=a807b7ab-6cad-4aa6-87d0-e283a7353a0f&limit=100',
             queryParameters: queryParameters, data: _data)
         .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = DataCounterResponse.fromJson(_result.data!);

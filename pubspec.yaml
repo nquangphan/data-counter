@@ -38,6 +38,9 @@ dependencies:
   hive_flutter: ^1.0.0
   logger: ^1.0.0
   shared_preferences: ^2.0.5
+  get_it: ^6.1.1
+  injectable: ^1.2.2
+  collection: ^1.15.0
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +48,8 @@ dev_dependencies:
   retrofit_generator: ^2.0.0-beta3
   hive_generator: ^1.0.1
   build_runner: any
+  injectable_generator: ^1.2.2
+ 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

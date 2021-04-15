@@ -1,17 +1,16 @@
-import 'package:data_counter/api/api_service.dart';
-import 'package:data_counter/screen/home-screen/bloc/home_bloc.dart';
-import 'package:data_counter/screen/home-screen/repository/home-repository.dart';
 import 'package:data_counter/screen/home-screen/view/home-screen.dart';
+import 'package:data_counter/utils/injectable.dart';
 import 'package:data_counter/utils/logger.dart';
 import 'package:data_counter/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config.dart';
 
 void main() {
-  runApp(MyApp());
+  runMain();
 }
 
 setupEnv(BuildFlavor buildFlavor, [bool runTest = false]) async {
@@ -39,13 +38,15 @@ setupEnv(BuildFlavor buildFlavor, [bool runTest = false]) async {
 }
 
 runMain() async {
+  await configureDependencies();
   WidgetsFlutterBinding.ensureInitialized();
+  packageInfo = await PackageInfo.fromPlatform();
+  sharedPreferences = await SharedPreferences.getInstance();
   await setupEnv(buildFlavor);
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  packageInfo = await PackageInfo.fromPlatform();
   await SystemChrome.setEnabledSystemUIOverlays([]);
   // await DatabaseManager.init();
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(

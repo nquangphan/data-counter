@@ -93,12 +93,13 @@ class HandleErrorInterceptor extends Interceptor {
 
   Future<bool> refreshToken() async {
     Dio _dio = Dio(BaseOptions(baseUrl: appBaseUrl));
-    final refreshToken = sharedPreferences.getString('refresh_token');
+    final refreshToken = sharedPreferences!.getString('refresh_token');
     final response =
         await _dio.post('/refreshToken', data: {'token': refreshToken});
 
     if (response.statusCode == 200) {
-      sharedPreferences.setString('access_token', response.data['accessToken']);
+      sharedPreferences!
+          .setString('access_token', response.data['accessToken']);
       appApiService.setOAuthToken(response.data['accessToken']);
       return true;
     }

@@ -23,5 +23,5 @@ String getEnvBuild() {
 appSetup() async {
   sharedPreferences = await SharedPreferences.getInstance();
   appVersion =
-      "${packageInfo.version}+${packageInfo.buildNumber} ${getEnvBuild()}";
+      "${packageInfo!.version}+${packageInfo!.buildNumber} ${getEnvBuild()}";
 }

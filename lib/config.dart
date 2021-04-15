@@ -18,8 +18,8 @@ AppApiService appApiService = AppApiService()..init();
 
 String appBaseUrl = "https://data.gov.sg/";
 
-late PackageInfo packageInfo;
-
 String appVersion = "1.0.0";
 
-late SharedPreferences sharedPreferences;
+SharedPreferences? sharedPreferences;
+
+PackageInfo? packageInfo;

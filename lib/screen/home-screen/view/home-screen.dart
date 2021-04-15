@@ -2,20 +2,18 @@ import 'package:data_counter/screen/home-screen/bloc/home_bloc.dart';
 import 'package:data_counter/screen/home-screen/repository/home-repository.dart';
 import 'package:data_counter/screen/home-screen/widget/data-item.dart';
 import 'package:data_counter/utils/dio-error-mixin.dart';
+import 'package:data_counter/utils/injectable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
+
   static Widget widget() {
-    HomeRepository repo = HomeRepository();
     return BlocProvider(
-      create: (context) => HomeBloc(repo),
-      child: RepositoryProvider(
-        create: (context) => repo,
-        child: HomeScreen(),
-      ),
+      create: (context) => getIt.get<HomeBloc>(),
+      child: HomeScreen(),
     );
   }
 
@@ -24,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
-  late HomeRepository _repo;
   late ScrollController _controller;
   @override
   void initState() {
@@ -37,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
     if (_controller.offset >= _controller.position.maxScrollExtent &&
         !_controller.position.outOfRange) {
       // message = "reach the bottom";
-      if (!_repo.isLoadAllData())
+      if (!context.read<HomeBloc>().isLoadAllData())
         context.read<HomeBloc>().add(LoadMoreDataEvent());
     }
     if (_controller.offset <= _controller.position.minScrollExtent &&
@@ -48,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
 
   @override
   Widget build(BuildContext context) {
-    _repo = context.watch();
     return Scaffold(
       appBar: AppBar(
         title: Text('Data counter application'),
@@ -60,34 +56,25 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
               context.read<HomeBloc>().add(GetDataEvent());
             },
             child: BlocBuilder<HomeBloc, HomeState>(
-              buildWhen: (previous, current) => current is RenderDataState,
+              buildWhen: (previous, current) =>
+                  current is RenderDataState || current is GetDataErrorState,
               builder: (context, state) {
-                if (_repo.data?.result?.records?.isNotEmpty != true &&
-                    state is GetDataErrorState) {
-                  return Container(
-                      child: Center(
-                          child: TextButton(
-                    child: Text('Retry', style: TextStyle(color: Colors.white)),
-                    onPressed: () {
-                      context.read<HomeBloc>().add(GetDataEvent());
-                    },
-                    style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all(Colors.blueAccent)),
-                  )));
+                if (state is GetDataErrorState) {
+                  return retryWidget;
                 }
-                return Container(
-                  child: ListView.builder(
-                    controller: _controller,
-                    itemCount: _repo.records.length ?? 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      return DataItem(
-                        record: _repo.records[index],
-                        prevRecord: index > 0 ? _repo.records[index - 1] : null,
-                      );
-                    },
-                  ),
-                );
+                if (state is RenderDataState)
+                  return Container(
+                    child: ListView.builder(
+                      controller: _controller,
+                      itemCount: state.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return DataItem(
+                          data: state.data[index],
+                        );
+                      },
+                    ),
+                  );
+                return SizedBox.shrink();
               },
             ),
           ),
@@ -109,6 +96,19 @@ class _HomeScreenState extends State<HomeScreen> with DioErrorHandler {
         ],
       ),
     );
+  }
+
+  Widget get retryWidget {
+    return Container(
+        child: Center(
+            child: TextButton(
+      child: Text('Retry', style: TextStyle(color: Colors.white)),
+      onPressed: () {
+        context.read<HomeBloc>().add(GetDataEvent());
+      },
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.blueAccent)),
+    )));
   }
 
   _handleStateListener(BuildContext context, HomeState state) {

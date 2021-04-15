@@ -1,15 +1,14 @@
-import 'package:data_counter/models/data-counter-model.dart';
+import 'package:data_counter/models/data-by-year-model.dart';
 import 'package:flutter/material.dart';
 
 class DataItem extends StatelessWidget {
-  const DataItem({Key? key, this.record, this.prevRecord}) : super(key: key);
-  final Record? record;
-  final Record? prevRecord;
+  const DataItem({Key? key, required this.data}) : super(key: key);
+  final DataByYear data;
   @override
   Widget build(BuildContext context) {
-    if (record == null) {
-      return SizedBox.shrink();
-    }
+    // if (record == null) {
+    //   return SizedBox.shrink();
+    // }
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -22,10 +21,9 @@ class DataItem extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: <Widget>[
-          Text(record!.quarter ?? 'unknow quarter'),
+          Text(data.year),
           Expanded(child: Container()),
-          prevRecord != null &&
-                  prevRecord!.volumeOfMobileData > record!.volumeOfMobileData
+          data.isDecrement
               ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Icon(
@@ -35,7 +33,7 @@ class DataItem extends StatelessWidget {
                   ),
                 )
               : SizedBox.shrink(),
-          Text(record!.volumeOfMobileData.toString(),
+          Text(data.totalData.toString(),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),

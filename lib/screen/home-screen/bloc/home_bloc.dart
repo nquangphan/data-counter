@@ -1,14 +1,17 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:data_counter/models/data-by-year-model.dart';
 import 'package:data_counter/models/data-counter-model.dart';
 import 'package:data_counter/screen/home-screen/repository/home-repository.dart';
 import 'package:equatable/equatable.dart';
+import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
+@injectable
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc(this.repo) : super(HomeInitial()) {
     add(GetDataEvent());
@@ -34,8 +37,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
     if (res is DataCounterResponse) {
       repo.data = res;
-      repo.records = res.result?.records ?? [];
-      yield RenderDataState();
+      repo.recordsQuarter = res.result?.records ?? [];
+      repo.caculateDataByYear();
+      yield RenderDataState(repo.dataByYear);
     } else {
       yield GetDataErrorState(error);
     }
@@ -49,12 +53,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       error = onError;
     });
     if (res is DataCounterResponse) {
-      repo.records.addAll(res.result?.records ?? []);
+      repo.recordsQuarter.addAll(res.result?.records ?? []);
       repo.data?.result?.links = res.result?.links;
       repo.data?.result?.total = res.result?.total;
-      yield RenderDataState();
+      repo.caculateDataByYear();
+      yield RenderDataState(repo.dataByYear);
     } else {
       yield GetDataErrorState(error);
     }
+  }
+
+  bool isLoadAllData() {
+    return repo.recordsQuarter.length == (repo.data?.result?.total ?? -1);
   }
 }
